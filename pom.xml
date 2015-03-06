@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.igladkiy.gwt.ita</groupId>
+  <artifactId>ita</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>gwt-basic-rpc-tomcat</name>
+  <description>GWT with RPC using Tomcat</description>
+
+  <!-- Tomcat -->
+  <!-- mvn help:describe -Dplugin=tomcat7 -->
+
+  <!-- Running with Maven -->
+  <!-- mvn clean install -->
+  <!-- mvn tomcat7:start - start web server -->
+  <!-- mvn gwt:run-codeserver - start gwt code server -->
+  <!-- goto http://localhost:8080 -->
+  <!-- mvn tomcat7:stop - stop web server -->
+
+  <properties>
+    <!-- GWT -->
+    <gwt.version>2.7.0</gwt.version>
+
+    <!-- Tomcat -->
+
+    <!-- Maven -->
+    <guice.version>4.0-beta5</guice.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <build>
+    <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
+
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>/src/main/webapp</directory>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.1</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>display-dependency-updates</goal>
+              <goal>display-plugin-updates</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Ignore GWTTestCases when running JUnit Runner -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.18</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*GwtTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- GWT -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>${gwt.version}</version>
+        <configuration>
+          <strict>true</strict>
+
+          <testTimeOut>180</testTimeOut>
+          <mode>htmlunit</mode>
+          <!-- Switch to a suite to run tests faster -->
+          <!-- <includes>**/*GwtTestSuite.java</includes> -->
+          <!-- <excludes>**/*GwtTest.java</excludes> -->
+          <includes>**/*GwtTest.java</includes>
+
+          <extraJvmArgs>-Xmx1G -XX:MaxPermSize=256M</extraJvmArgs>
+          <logLevel>INFO</logLevel>
+          <style>OBF</style>
+
+          <!-- mvn gwt:run-codeserver - won't have to use the bookmarklet -->
+          <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+
+          <runTarget>ita.html</runTarget>
+          <modules>
+            <module>com.igladkiy.gwt.ita.ita</module>
+          </modules>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp</directory>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
+
+      <!-- http://tomcat.apache.org/maven-plugin-2.2/context-goals.html - goals -->
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat7-maven-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <webappDirectory>src/main/webapp</webappDirectory>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <!-- Eclipse m2e Enhancing -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <versionRange>[2.1,)</versionRange>
+                    <goals>
+                      <goal>display-plugin-updates</goal>
+                      <goal>display-dependency-updates</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencies>
+    <!-- GWT -->
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwt.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${gwt.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-codeserver</artifactId>
+      <version>${gwt.version}</version>
+    </dependency>
+
+    <!-- Server -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>3.0-alpha-1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.0.0.GA</version>
+      <classifier>sources</classifier>
+    </dependency>
+    
+    <dependency>
+	    <groupId>javax.ws.rs</groupId>
+	    <artifactId>javax.ws.rs-api</artifactId>
+	    <version>2.0</version>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.glassfish.jersey.containers</groupId>
+	    <!-- if your container implements Servlet API older than 3.0, use "jersey-container-servlet-core"  -->
+	    <artifactId>jersey-container-servlet-core</artifactId>
+	    <version>2.7</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>org.glassfish.jersey.media</groupId>
+    	<artifactId>jersey-media-json-jackson</artifactId>
+    	<version>2.7</version>
+	</dependency>
+	
+	<dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>2.3.2</version>
+   </dependency>
+
+	<dependency>
+        <groupId>org.fusesource.restygwt</groupId>
+        <artifactId>restygwt</artifactId>
+        <version>1.4</version>
+	</dependency>
+  </dependencies>
+</project>
