@@ -55,6 +55,7 @@ public class itaEntryPoint implements EntryPoint {
 				});
 			}
 		});
+		vp.add(new Label("AAA"));
 	}
 
 }
